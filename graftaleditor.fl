@@ -1,0 +1,53 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0302 
+header_name {.hh} 
+code_name {.cc}
+decl {\#include <SDL2/SDL.h>} {private global
+} 
+
+class UserInterface {open
+} {
+  Function {UserInterface()} {open
+  } {
+    Fl_Window win {
+      label Graftals open
+      xywh {322 181 570 410} type Double
+      code0 {win->show();} visible
+    } {
+      Fl_Input graftal {
+        label {&Graftal}
+        user_data this user_data_type {UserInterface*}
+        callback {this->new_graftal(o->value());}
+        tooltip {Enter the Graftal here.} xywh {95 5 475 30}
+      }
+      Fl_Text_Editor rules {
+        label {&Rules}
+        tooltip {Enter the graphtal transformation mapping rules here.} xywh {95 70 475 340}
+        code0 {rules->buffer(new Fl_Text_Buffer);}
+      }
+      Fl_Button next {
+        label {&Next}
+        tooltip {Next Iteration.} xywh {5 70 85 25}
+      }
+      Fl_Button quit {
+        label {&Quit}
+        callback {win->hide();}
+        tooltip {Quit this ugly program.} xywh {20 380 60 25}
+      }
+      Fl_Button {} {
+        label {&Previous}
+        tooltip {Previous Iteration.} xywh {5 100 85 25}
+      }
+    }
+  }
+  Function {new_graftal(const char *txt)} {
+    comment {Set the new Graftal.} open return_type {virtual void}
+  } {
+    code {//} {selected
+    }
+  }
+  Function {~UserInterface()} {open return_type virtual
+  } {
+    code {//} {}
+  }
+} 
