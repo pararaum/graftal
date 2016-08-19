@@ -10,7 +10,7 @@ simple_graftal: simple_graftal.o $(OBJS)
 	$(CXX) -g -o $@ $< $(LIBS) $(OBJS)
 
 graftal_ui: graftal_ui.o graftaleditor.o $(OBJS)
-	$(CXX) -g -o $@ $+ $(LIBS) -lfltk
+	$(CXX) -g -o $@ $+ $(LIBS) -lfltk -pthread
 
 graftaleditor.cc: graftaleditor.fl
 	fluid -c $<

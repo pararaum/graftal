@@ -3,6 +3,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <cassert>
+#include <thread>
 #include "graftaleditor.hh"
 #include "graftal.hh"
 #include "displaygraf.hh"
@@ -136,10 +137,8 @@ public:
   }
 };
 
-int flthread(void *data_) {
-  assert(data_);
-  Mutex<GraftalIterator> *data = static_cast<Mutex<GraftalIterator>*> (data_);
-  ExtendedUserInterface *ui = new ExtendedUserInterface(data);
+int flthreadfun(Mutex<GraftalIterator> &data) {
+  ExtendedUserInterface *ui = new ExtendedUserInterface(&data);
   assert(ui);
   int ret = Fl::run();
   std::cout << "flthread: ret=" << ret << std::endl;
@@ -197,9 +196,10 @@ int main(int argc, char **argv) {
       Mutex<SDLInterface&> msdl(wren);
       Mutex<GraftalIterator> grafiter(GraftalIterator("1"));
       //SDL_SetWindowBordered(wren, SDL_FALSE);
-      SDL_Thread *threadtry = SDL_CreateThread(useless_function, "Example Thread", NULL);
-      SDL_DetachThread(threadtry);
-      SDL_DetachThread(SDL_CreateThread(flthread, "user interface", &grafiter));
+      std::thread threadtry(useless_function, (void*)NULL);
+      threadtry.detach();
+      std::thread flthread(flthreadfun, std::ref(grafiter));
+      flthread.detach();
       //Handle events in main thread; if this ends then the program ends.
       event_loop(msdl, grafiter);
     }
