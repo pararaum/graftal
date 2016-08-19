@@ -5,6 +5,7 @@
 #include <cassert>
 #include "graftaleditor.hh"
 #include "graftal.hh"
+#include "displaygraf.hh"
 
 #define WINWIDTH 1000
 #define WINHEIGHT 800
@@ -108,6 +109,19 @@ int useless_function(void *data) {
   return 0;
 }
 
+/*! \brief push one of the user events
+ *
+ * Push one of the user events into the SDL queue.
+ *
+ * \param eventnum event number to push
+ */
+void push_user_event(MyEvents eventnum) {
+  assert(eventnum < EVENT_MAXIMUM);
+  SDL_Event event;
+  event.type = eventnum + minimum_event;
+  SDL_PushEvent(&event);
+}
+
 class ExtendedUserInterface : private UserInterface {
   Mutex<GraftalIterator> *grafiter;
 public:
@@ -118,6 +132,7 @@ public:
       (*graf).graftal = txt;
       std::cout << "New graftal set to: " << txt << std::endl;
     }
+    push_user_event(EVENT_REDRAW);
   }
 };
 
@@ -134,17 +149,21 @@ int flthread(void *data_) {
   return ret;
 }
 
-void event_loop(Mutex<SDLInterface&> &msdl) {
+void draw_it(Mutex<SDLInterface&> &msdl, Mutex<GraftalIterator> &grafiter) {
+  auto sdlint = msdl.get();
+  SDL_SetRenderDrawColor(*sdlint, 0, 0, 0, 255);
+  SDL_RenderClear(*sdlint);
+  DisplayGraftal disp(*sdlint, WINWIDTH/2, WINHEIGHT-10);
+  auto gf = grafiter.get();
+  disp.draw((*gf).graftal);
+  SDL_RenderPresent(*sdlint);
+}
+
+void event_loop(Mutex<SDLInterface&> &msdl, Mutex<GraftalIterator> &grafiter) {
   bool running = true;
   int count = 0;
   do {
     SDL_Event event;
-    {
-      auto sdlint = msdl.get();
-      SDL_SetRenderDrawColor(*sdlint, 0, 0, static_cast<Uint8>(count >> 1), 255);
-      SDL_RenderClear(*sdlint);
-      SDL_RenderPresent(*sdlint);
-    }
     while(SDL_PollEvent(&event) == 1) {
       switch(event.type) {
       case SDL_QUIT:
@@ -154,7 +173,10 @@ void event_loop(Mutex<SDLInterface&> &msdl) {
 	std::cout << "Button!\n";
 	break;
       default:
-	//Ignore
+	if(event.type == EVENT_REDRAW + minimum_event) {
+	  std::cout << "Redraw!\n";
+	  draw_it(msdl, grafiter);
+	}
 	break;
       }
     }
@@ -176,7 +198,7 @@ int main(int argc, char **argv) {
       SDL_DetachThread(threadtry);
       SDL_DetachThread(SDL_CreateThread(flthread, "user interface", &grafiter));
       //Handle events in main thread; if this ends then the program ends.
-      event_loop(msdl);
+      event_loop(msdl, grafiter);
     }
   }
   catch(const std::exception &excp) {

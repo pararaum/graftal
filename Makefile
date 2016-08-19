@@ -2,7 +2,7 @@
 
 CXXFLAGS=-g -Wall -O2 -std=c++11
 LIBS=-lSDL2
-OBJS=graftal.o
+OBJS=graftal.o displaygraf.o
 
 all: graftaleditor.cc simple_graftal graftal_ui
 
