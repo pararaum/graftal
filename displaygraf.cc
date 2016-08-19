@@ -6,8 +6,8 @@ void DisplayGraftal::draw(const std::string &graftal) {
   GrafState oldstate(state);
   SDL_Rect rect;
 
-  SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-  SDL_RenderClear(ren);
+  //SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+  //SDL_RenderClear(ren);
   //std::cerr << '"' << graftal << '"' << std::endl;
   while(pos < graftal.size()) {
     //std::cout << '\t' << graftal[pos] << std::endl;
@@ -49,6 +49,6 @@ void DisplayGraftal::draw(const std::string &graftal) {
     }
     pos += 1;
   }
-  SDL_RenderPresent(ren);
+  //SDL_RenderPresent(ren);
   state = oldstate;
 }

@@ -151,17 +151,20 @@ int flthread(void *data_) {
 
 void draw_it(Mutex<SDLInterface&> &msdl, Mutex<GraftalIterator> &grafiter) {
   auto sdlint = msdl.get();
-  SDL_SetRenderDrawColor(*sdlint, 0, 0, 0, 255);
-  SDL_RenderClear(*sdlint);
+  SDL_Renderer *ren = static_cast<SDL_Renderer*>(*sdlint);
+  std::cout << ren << std::endl;
+  SDL_SetRenderDrawColor(ren, 0, 0, 0x5A, 255);
+  SDL_RenderClear(ren);
   DisplayGraftal disp(*sdlint, WINWIDTH/2, WINHEIGHT-10);
   auto gf = grafiter.get();
   disp.draw((*gf).graftal);
-  SDL_RenderPresent(*sdlint);
+  SDL_RenderPresent(ren);
 }
 
 void event_loop(Mutex<SDLInterface&> &msdl, Mutex<GraftalIterator> &grafiter) {
   bool running = true;
   int count = 0;
+  draw_it(msdl, grafiter);
   do {
     SDL_Event event;
     while(SDL_PollEvent(&event) == 1) {

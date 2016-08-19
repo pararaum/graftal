@@ -27,7 +27,10 @@ public:
 
   void handle_events(void) {
     SDL_Event event;
+    SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+    SDL_RenderClear(ren);
     draw(grafiter.graftal);
+    SDL_RenderPresent(ren);
     while(SDL_WaitEvent(&event) == 1) {
       switch(event.type) {
       case SDL_KEYDOWN:
@@ -44,7 +47,10 @@ public:
 	} else {
 	  next_gen();
 	}
+	SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+	SDL_RenderClear(ren);
 	draw(grafiter.graftal);
+	SDL_RenderPresent(ren);
 	break;
       default:
 	//Ignore
